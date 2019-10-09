@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-/** Util for general framework. */
+/** Util for general sketch families. */
 public class GeneralUtil {	
 	public static String path = "..\\..\\result\\";
 	public static Boolean isDstAsID = true;
@@ -19,7 +19,7 @@ public class GeneralUtil {
 	public static String dataStreamForFlowSpread = "..\\..\\data\\datatrace.txt"; 
 	public static String dataSummaryForFlowSpread = "..\\..\\data\\dstspread.txt";
 	
-	/** get flow id for size measurement in each row of a file. */
+	/** Get flow id for size measurement in each row of a file. */
 	public static String getSizeFlowID(String[] strs, Boolean isEncoding) {
 		if (strs.length == 0) return "";
 		else if (isEncoding) return Arrays.stream(strs).collect(Collectors.joining("\t"));
@@ -32,8 +32,8 @@ public class GeneralUtil {
 		else return Long.parseLong(strs[0]);
 	}
 	
-	/** get flow id and element id for spread measurement in each row of a file. */
-	public static String[] getSperadFlowIDAndElementID(String[] strs, Boolean isEncoding) {
+	/** Get flow id and element id for spread measurement in each row of a file. */
+	public static String[] getSpreadFlowIDAndElementID(String[] strs, Boolean isEncoding) {
 		String[] res = new String[2];
 		if (isEncoding) {
 			if (isDstAsID) {res[0] = strs[1]; res[1] = strs[0];}
