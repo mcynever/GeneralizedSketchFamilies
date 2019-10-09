@@ -10,32 +10,32 @@ import java.util.Set;
 
 
 /** A general framework for cSketch family. The elementary data structures to be shared here can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
- * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow cardinalities
+ * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow spreads.
  * @author Jay, Youlin, 2018. 
  */
 
 public class GeneralCountMin {
 	public static Random rand = new Random();
 	
-	public static int n = 0; 						// total number of packets
+	public static int n = 0; 					// total number of packets
 	public static int flows = 0; 					// total number of flows
 	public static int avgAccess = 0; 				// average memory access for each packet
-	public static final int M = 1024 * 1024 * 8; 	// total memory space Mbits	
+	public static final int M = 1024 * 1024 * 8; 			// total memory space Mbits	
 	public static GeneralDataStructure[][] C;
 	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); // 0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList()); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	
 	/** parameters for count-min */
-	public static final int d = 4; 			// the number of rows in Count Min
-	public static int w = 1;				// the number of columns in Count Min
-	public static int u = 1;				// the size of each elementary data structure in Count Min.
-	public static int[] S = new int[d];		// random seeds for Count Min
-	public static int m = 1;				// number of bit/register in each unit (used for bitmap, FM sketch and HLL sketch)
+	public static final int d = 4; 			// the number of arrays in cSketch
+	public static int w = 1;			// the number of estimators in each array.
+	public static int u = 1;			// the size of each elementary data structure in cSketch.
+	public static int[] S = new int[d];		// random seeds.
+	public static int m = 1;			// number of bits/registers in each unit (used for bitmap, FM sketch and HLL sketch)
 
 	
 	/** parameters for counter */
 	public static int mValueCounter = 1;			// only one counter in the counter data structure
-	public static int counterSize = 32;				// size of each unit
+	public static int counterSize = 32;			// size of each unit
 
 	/** parameters for bitmap */
 	public static final int bitArrayLength = 20000;
@@ -47,36 +47,27 @@ public class GeneralCountMin {
 	/** parameters for HLL sketch **/
 	public static int mValueHLL = 128;
 	public static final int HLLSize = 5;
-
-	public static int times = 0;
-	
-	/** number of runs for throughput measurement */
-	public static int loops = 100;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		System.out.println("Start****************************");
 		/** measurement for flow sizes **/
 		for (int i : sizeMeasurementConfig) {
-			times = 0;
-			for(int j = 0; j < 1; j++) {
-				initCM(i);
-				encodeSize(GeneralUtil.dataStreamForFlowSize);
+			initCM(i);
+			encodeSize(GeneralUtil.dataStreamForFlowSize);
 	        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-	        	times++;
-			}
 		}
 		
 		/** measurement for flow spreads **/
 		for (int i : spreadMeasurementConfig) {
 			initCM(i);
 			encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
+    			estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
 		}
 		
 		System.out.println("DONE!****************************");
 	}
 	
-	// Init the Count Min for different elementary data structures.
+	// Init the cSketch for different elementary data structures.
 	public static void initCM(int index) {
 		switch (index) {
 	        case 0: case -1: C = generateCounter();
@@ -93,7 +84,7 @@ public class GeneralCountMin {
 		System.out.println("\nCount Min-" + C[0][0].getDataStructureName() + " Initialized!");
 	}
 	
-	// Generate counter base Counter Min for flow size measurement.
+	// Generate cSketch(counter) for flow size measurement.
 	public static Counter[][] generateCounter() {
 		m = mValueCounter;
 		u = counterSize * mValueCounter;
@@ -107,7 +98,7 @@ public class GeneralCountMin {
 		return B;
 	}
 	
-	// Generate bitmap base Counter Min for flow cardinality measurement.
+	// Generate cSketch(bitmap) for flow size/spread measurement.
 	public static Bitmap[][] generateBitmap() {
 		m = bitArrayLength;
 		u = bitArrayLength;
@@ -121,7 +112,7 @@ public class GeneralCountMin {
 		return B;
 	}
 	
-	// Generate FM sketch base Counter Min for flow cardinality measurement.
+	// Generate cSketch(FMsketch) for flow size/spread measurement.
 	public static FMsketch[][] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize * mValueFM;
@@ -135,7 +126,7 @@ public class GeneralCountMin {
 		return B;
 	}
 	
-	// Generate HLL sketch base Counter Min for flow cardinality measurement.
+	// Generate cSketch(HLL) for flow size/spread measurement.
 	public static HyperLogLog[][] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize * mValueHLL;
@@ -149,7 +140,7 @@ public class GeneralCountMin {
 		return B;
 	}
 	
-	// Generate random seeds for Counter Min.
+	// Generate random seeds for cSketch.
 	public static void generateCMRamdonSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		int num = d;
@@ -163,7 +154,7 @@ public class GeneralCountMin {
 		}
 	}
 
-	/** Encode elements to the Count Min for flow size measurement. */
+	/** Encode elements to the cSketch for flow size measurement. */
 	public static void encodeSize(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s..." );
 		Scanner sc = new Scanner(new File(filePath));
@@ -209,7 +200,7 @@ public class GeneralCountMin {
 	}
 	
 	
-	/** Encode elements to the Count Min for flow spread measurement. */
+	/** Encode elements to cSketch for flow spread measurement. */
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s..." );
 		Scanner sc = new Scanner(new File(filePath));
