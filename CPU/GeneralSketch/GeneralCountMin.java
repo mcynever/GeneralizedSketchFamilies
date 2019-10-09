@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 
-/** A general framework for cSketch family. The elementary data structures to be shared here can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
+/** A general framework for cSketch family. The elementary data structures to be plugged into can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
  * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow spreads.
  * @author Jay, Youlin, 2018. 
  */
