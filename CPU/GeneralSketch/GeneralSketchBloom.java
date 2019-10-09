@@ -8,12 +8,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-/**
- * for SIGMETRICS2020 Bsketch
- * changes based on CountMin: 
- * 1) one array
- * 2) change in initialization of w (w is the number of basic data structures in each segment, w / m)
- * 3) same encode and estimate
+/** 
+ * A general framework for bSketch family. The elementary data structures to be plugged into can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
+ * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow spreads.
  * @author Youlin
  */
 
