@@ -25,7 +25,7 @@ public class GeneralCountMin {
 	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); // 0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList()); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	
-	/** parameters for count-min */
+	/** parameters for cSketch */
 	public static final int d = 4; 			// the number of arrays in cSketch
 	public static int w = 1;			// the number of estimators in each array.
 	public static int u = 1;			// the size of each elementary data structure in cSketch.
