@@ -10,7 +10,6 @@ Bitmap *newBitmap(int m, int size) {
 	for (i = 0; i < m; i++) {
 		b->B[i] = false;
 	}
-	// printf("%s\n", "This is a bitmap");
 	return b;
 }
 
@@ -20,7 +19,6 @@ void encodeBitmap(const Bitmap *b) {
 	int k = r % b->arraySize;
 	if(k<0){printk(KERN_EMERG"k less than zero!\n"); return;}
 	b->B[k] = true;
-	// printf("%s\n", "This is a bitmap");
 }
 
 void encodeBitmapEID(const Bitmap *b, int elementID) {
@@ -31,7 +29,7 @@ void encodeBitmapEID(const Bitmap *b, int elementID) {
 void encodeBitmapSegment(const Bitmap *b, int flowID, int *s, int w) {
 	int ms = b->arraySize / w;
 	int r = rand();
-	int j = r % ms;			// (GeneralUtil::intHash(flowID) % ms + ms) % ms;							// rand() % ms;
+	int j = r % ms;	
 	int k = (intHash(flowID ^ s[j]) % w + w) % w;
 	int i = j * w + k;
 	b->B[i] = true;
