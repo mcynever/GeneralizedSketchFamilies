@@ -8,13 +8,12 @@ import java.util.stream.Collectors;
 
 /** Util for general framework. */
 public class GeneralUtil {	
-	public static String path = "\\D:\\GF-EXP\\";
+	public static String path = "..\\..\\result\\";
 	public static Boolean isDstAsID = true;
-	public static String dataStreamForFlowSize = "\\D:\\CAIDA\\"; 
-	public static String dataSummaryForFlowSize = "\\D:\\CAIDA\\T";
-	public static String dataStreamForFlowSpread = "\\D:\\CAIDA\\"; 
-	public static String dataSummaryForFlowSpread = "\\D:\\CAIDA\\T";
-	public static int periods=5;
+	public static String dataStreamForFlowSize = "..\\..\\data\\time\\"; 
+	public static String dataSummaryForFlowSize = "..\\..\\data\\time\\T";
+	public static String dataStreamForFlowSpread = "..\\..\\data\\time\\"; 
+	public static String dataSummaryForFlowSpread = "..\\..\\data\\time\\T";
 
 	/** get flow id for size measurment in each row of a file. */
 	public static String getSizeFlowID(String[] strs, Boolean isEncoding) {

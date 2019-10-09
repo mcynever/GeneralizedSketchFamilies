@@ -9,11 +9,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * for SIGMETRICS2020 sketchBlm
- * changes based on CountMin: 
- * 1) one array
- * 2) change in initialization of w (w is the number of basic data structures in each segment, w / m)
- * 3) same encode and estimate
+ * A general framework for bSketch family. The elementary data structures to be plugged into can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
+ * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow sizes/spreads.
  * @author Youlin
  */
 
@@ -29,12 +26,12 @@ public class GeneralSketchBloom {
 	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); // 0-Counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList()); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
 
-	/** parameters for count-min */
-	public static final int d = 4; 			// the number of rows in Count Min
-	public static int w = 1;				// the number of columns in Count Min
-	public static int u = 1;				// the size of each elementary data structure in Count Min.
-	public static int[] S = new int[d];		// random seeds for Count Min
-	public static int m = 1;				// number of bit/register in each unit (used for bitmap, FM sketch and HLL sketch)
+	/** parameters for bSketch */
+	public static final int d = 4; 			// the number of estimators for each flow in bSketch
+	public static int w = 1;			// the number of arrays in bSketch
+	public static int u = 1;			// the size of each elementary data structure in Count Min.
+	public static int[] S = new int[d];		// random seeds for bSketch
+	public static int m = 1;			// number of bits/registers in each unit (used for bitmap, FM sketch and HLL sketch)
 
 
 	/** parameters for counter */
@@ -51,111 +48,32 @@ public class GeneralSketchBloom {
 	/** parameters for HLL sketch **/
 	public static int mValueHLL = 128;
 	public static final int HLLSize = 5;
-
-	public static int times = 1;
 	
-	/** number of runs for throughput measurement */
-	public static int loops = 100;
-
-	public static int[][] Marray= {{8},{8}};
-	public static int[][]	mValueCounterarray= {{1},{1}};
-	public static int[][] bitArrayLengtharray= {{50000},{5000}};
-	public static int[][] mValueFMarray= {{128},{128}};
-	public static int[][] mValueHLLarray= {{128},{128}};
-	public static int[][] periodsarray= {{1,5,10},{1,5,10}};
+	
+	public static int periods=5;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		System.out.println("Start****************************");
-		for (int i : sizeMeasurementConfig) {
-			for(int l=0;l<periodsarray[0].length;l++) {
-				GeneralUtil.periods=periodsarray[0][l];
-			for(int i1=0;i1<Marray[0].length;i1++) {
-				M=Marray[0][i1]*1024*1024;
-				switch (i) {
-				case 0:
-				   for(int j=0;j<mValueCounterarray[0].length;j++) {
-					   mValueCounter=mValueCounterarray[0][j];
-					   initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-
-				   }
-				   break;
-				case 1:
-					for(int j=0;j<bitArrayLengtharray[0].length;j++) {
-						bitArrayLength=bitArrayLengtharray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[0].length;j++) {
-						mValueFM=mValueFMarray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[0].length;j++) {			
-						mValueHLL=mValueHLLarray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-
-					}
-					break;
-				default:break;
-				}
-			}
-			}
-		}
 		
+		/** measurement for flow sizes **/
+		for (int i : sizeMeasurementConfig) {
+				initCM(i);
+				encodeSize(GeneralUtil.dataStreamForFlowSize);
+			  estimateSize(GeneralUtil.dataSummaryForFlowSize);
+		}
+
 		/** measurment for flow spreads **/
 		for (int i : spreadMeasurementConfig) {
-			for(int l=0;l<periodsarray[1].length;l++) {
-				GeneralUtil.periods=periodsarray[1][l];
-			for(int i1=0;i1<Marray[1].length;i1++) {
-				M=Marray[1][i1]*1024*1024;
-				switch (i) {
-				case 1:
-					for(int j=0;j<bitArrayLengtharray[1].length;j++) {
-						bitArrayLength=bitArrayLengtharray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[1].length;j++) {
-						mValueFM=mValueFMarray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[1].length;j++) {			
-						mValueHLL=mValueHLLarray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				default:break;
-				}
-			}
-			}
+				initCM(i);
+				encodeSpread(GeneralUtil.dataStreamForFlowSpread);
+			  estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
 		}
 
 
 		System.out.println("DONE!****************************");
 	}
 
-	// Generate counter base Counter Bloom for flow size measurement.
+	// Generate bSkt(counter) for flow size measurement.
 	public static Counter[][] generateCounter() {
 		m = mValueCounter;
 		u = counterSize * mValueCounter;
@@ -167,8 +85,8 @@ public class GeneralSketchBloom {
 			}
 		}
 		
-		Counter[][][] BP = new Counter[GeneralUtil.periods][1][w];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		Counter[][][] BP = new Counter[periods][1][w];
+		for(int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			BP[t][0][j] = new Counter(1, counterSize);
 		}
@@ -176,7 +94,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate bitmap base Bitmap Bloom for flow cardinality measurement.
+	// Generate bSkt(bitmap) for flow size/spread measurement.
 	public static Bitmap[][] generateBitmap() {
 		m = bitArrayLength;
 		u = bitArrayLength;
@@ -187,8 +105,8 @@ public class GeneralSketchBloom {
 				B[i][j] = new Bitmap(bitArrayLength);
 			}
 		}
-		Bitmap[][][] BP = new Bitmap[GeneralUtil.periods][1][w];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		Bitmap[][][] BP = new Bitmap[periods][1][w];
+		for(int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			BP[t][0][j] = new Bitmap(bitArrayLength);
 		}
@@ -196,7 +114,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate FM sketch base FMsketch Bloom for flow cardinality measurement.
+	// Generate bSkt(FMsketch) for flow size/spread measurement.
 	public static FMsketch[][] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize * mValueFM;
@@ -208,8 +126,8 @@ public class GeneralSketchBloom {
 			}
 		}
 		
-		FMsketch[][][] BP = new FMsketch[GeneralUtil.periods][1][w];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		FMsketch[][][] BP = new FMsketch[periods][1][w];
+		for(int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			 BP[t][0][j] = new FMsketch(mValueFM, FMsketchSize);
 		}
@@ -217,7 +135,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate HLL sketch base HLL Bloom for flow cardinality measurement.
+	// Generate bSkt(HLL) for flow size/spread measurement.
 	public static HyperLogLog[][] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize * mValueHLL;
@@ -228,8 +146,8 @@ public class GeneralSketchBloom {
 				B[i][j] = new HyperLogLog(mValueHLL, HLLSize);
 			}
 		}
-		HyperLogLog[][][] BP = new HyperLogLog[GeneralUtil.periods][1][w];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		HyperLogLog[][][] BP = new HyperLogLog[periods][1][w];
+		for(int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			BP[t][0][j] = new HyperLogLog(mValueHLL, HLLSize);
 		}
@@ -237,7 +155,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Init the Count Min for different elementary data structures.
+	// Init bSketch for different elementary data structures.
 	public static void initCM(int index) {
 		switch (index) {
 		case 0: case -1: C = generateCounter();
@@ -251,10 +169,10 @@ public class GeneralSketchBloom {
 		default: break;
 		}
 		generateCMRandomSeeds();
-		System.out.println("\nSketchBloom-" + C[0][0].getDataStructureName() + " Initialized!-----------");
+		System.out.println("bSkt(" + C[0][0].getDataStructureName() + ") Initialized!-----------");
 	}
 	
-	// Generate random seeds for Counter Min.
+	// Generate random seeds for bSketch.
 	public static void generateCMRandomSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		int num = d;
@@ -268,46 +186,29 @@ public class GeneralSketchBloom {
 		}
 	}
 
-	/** Encode elements to the Count Min for flow size measurement. */
+	/** Encode elements to bSketch for flow size measurement. */
 	public static void encodeSize(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s for flow size measurement......" );
-		//Scanner sc = new Scanner(new File(filePath));
 		n = 0;
-		for (int t = 0; t < GeneralUtil.periods; t++) {
-			Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));
+		for (int t = 0; t < periods; t++) {
+				Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));
 
-			System.out.println("Input file: " + filePath + "output"+t+"v.txt" );
+				System.out.println("Input file: " + filePath + "output"+t+"v.txt" );
 
-		while (sc.hasNextLine()) {
-			String entry = sc.nextLine();
-			String[] strs = entry.split("\\s+");
-			String flowid = GeneralUtil.getSizeFlowID(strs, true);
-			n++;
-
-			/*/if (C[0][0].getDataStructureName().equals("Counter")) {
-				int minVal = Integer.MAX_VALUE;
-				for (int i = 0; i < d; i++) {
-					int j = (GeneralUtil.intHash(GeneralUtil.FNVHash1(flowid) ^ S[i]) % w + w) % w;
-					minVal = Math.min(minVal, C[0][j].getValue());
-				}
-				for (int i = 0; i < d; i++) {
-					int j = (GeneralUtil.intHash(GeneralUtil.FNVHash1(flowid) ^ S[i]) % w + w) % w;
-					if (C[0][j].getValue() == minVal) {
-						C[0][j].encode();           
+				while (sc.hasNextLine()) {
+					String entry = sc.nextLine();
+					String[] strs = entry.split("\\s+");
+					String flowid = GeneralUtil.getSizeFlowID(strs, true);
+					n++;	
+					for (int i = 0; i < d; i++) {
+							int j = (GeneralUtil.intHash(GeneralUtil.FNVHash1(flowid) ^ S[i]) % w + w) % w; 
+							CP[t][0][j].encode();
 					}
 				}
-			} else {/*/
-	
-				for (int i = 0; i < d; i++) {
-					int j = (GeneralUtil.intHash(GeneralUtil.FNVHash1(flowid) ^ S[i]) % w + w) % w; 
-					CP[t][0][j].encode();
-			//	}
-			}
+				System.out.println("Total number of encoded pakcets: " + n);
+				sc.close();
 		}
-		System.out.println("Total number of encoded pakcets: " + n);
-		sc.close();
-		}
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			C[0][j] = C[0][j].join(CP[t][0][j]);
 		}
@@ -317,10 +218,10 @@ public class GeneralSketchBloom {
 	/** Estimate flow sizes. */
 	public static void estimateSize(String filePath) throws FileNotFoundException {
 		System.out.println("Estimating Flow SIZEs..." ); 
-		Scanner sc = new Scanner(new File(filePath + GeneralUtil.periods + "\\outputsrcDstCount.txt"));
-		System.out.println(filePath + GeneralUtil.periods + "\\outputsrcDstCount.txt");
-		String resultFilePath = GeneralUtil.path + "SketchBloom\\size\\" + C[0][0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m + "_TTT_" + GeneralUtil.periods;
+		Scanner sc = new Scanner(new File(filePath + periods + "\\outputsrcDstCount.txt"));
+		System.out.println(filePath + periods + "\\outputsrcDstCount.txt");
+		String resultFilePath = GeneralUtil.path + "bSketch\\size\\" + C[0][0].getDataStructureName()
+				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m + "_TT_" + periods;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("w :" + w);
 		System.out.println("Result directory: " + resultFilePath); 
@@ -342,12 +243,11 @@ public class GeneralSketchBloom {
 		pw.close();
 	}
 	
-	/** Encode elements to the Count Min for flow spread measurement. */
+	/** Encode elements to bSketch for flow spread measurement. */
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s for flow spread measurement......" );
-		//Scanner sc = new Scanner(new File(filePath));
 		n = 0;
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));
 			
 			System.out.println("Input file: " + filePath + "output"+t+"v.txt" );
@@ -366,7 +266,7 @@ public class GeneralSketchBloom {
 		System.out.println("Total number of encoded pakcets: " + n); 
 		sc.close();
 		}
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			for(int j=0;j<w;j++)
 			C[0][j] = C[0][j].join(CP[t][0][j]);
 		}
@@ -375,18 +275,17 @@ public class GeneralSketchBloom {
 	/** Estimate flow spreads. */
 	public static void estimateSpread(String filepath) throws FileNotFoundException {
 		System.out.println("Estimating Flow CARDINALITY..." ); 
-		Scanner sc = new Scanner(new File(filepath + GeneralUtil.periods + "\\outputdstCard.txt"));
-		System.out.println(filepath + GeneralUtil.periods + "\\outputdstCard.txt");
+		Scanner sc = new Scanner(new File(filepath + periods + "\\outputdstCard.txt"));
+		System.out.println(filepath + periods + "\\outputdstCard.txt");
 		String resultFilePath = GeneralUtil.path + "SketchBloom\\spread\\" + C[0][0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m+"_TTT_" + GeneralUtil.periods;
+				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m+"_TT_" + periods;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("Result directory: " + resultFilePath); 
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
 			String flowid = GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0];
-			int num = Integer.parseInt(strs[strs.length-1]);
-			
+			int num = Integer.parseInt(strs[strs.length-1]);			
 				int estimate = Integer.MAX_VALUE;
 				
 				for(int i = 0; i < d; i++) {

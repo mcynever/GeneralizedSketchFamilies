@@ -9,8 +9,10 @@ import java.util.Scanner;
 import java.util.Set;
 
 
-/** A general framework for data structure sharing approach. The elementary data structures to be shared here can be counter, bitmap, FM sketch, HLL sketch. 
- * Specifically, we can use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estiamte flow cardinalities. 
+/** 
+ * A general framework for vSketch family. The elementary data structures to be plugged into can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
+ * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow sizes/spreads.
+ * @author Youlin
  */
 
 public class GeneralvSkt {
@@ -48,14 +50,9 @@ public class GeneralvSkt {
 	public static int mValueHLL = 128;
 	public static int HLLSize = 5;
 	
-	public static int times = 5;
 	
-	public static int[][] Marray= {{8},{8}};
-	public static int[][]	mValueCounterarray= {{1},{1}};
-	public static int[][] virtualArrayLengtharray= {{20000},{5000}};
-	public static int[][] mValueFMarray= {{128},{128}};
-	public static int[][] mValueHLLarray= {{128},{128}};
-	public static int[][] periodsarray= {{1,5,10},{1,5,10}};
+	
+	public static int periods=5;
 	
 	public static void main(String[] args) throws FileNotFoundException {
 
@@ -63,99 +60,29 @@ public class GeneralvSkt {
 		
 		/** measurment for flow sizes **/
 		for (int i : sizeMeasurementConfig) {
-			for(int l=0;l<periodsarray[0].length;l++) {
-				GeneralUtil.periods=periodsarray[0][l];
-			for(int i1=0;i1<Marray[0].length;i1++) {
-				M=Marray[0][i1]*1024*1024;
-				switch (i) {
-				case 0:
-				   for(int j=0;j<mValueCounterarray[0].length;j++) {
-					   mValueCounter=mValueCounterarray[0][j];
-					   initSharing(i);
-					   initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-				   }
-				   break;
-				case 1:
-					for(int j=0;j<virtualArrayLengtharray[0].length;j++) {
-						virtualArrayLength=virtualArrayLengtharray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[0].length;j++) {
-						mValueFM=mValueFMarray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[0].length;j++) {			
-						mValueHLL=mValueHLLarray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-						estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				default:break;
-				}
-			}
-			}
+				initSharing(i);
+				initJoining(i);
+				encodeSize(GeneralUtil.dataStreamForFlowSize);
+				estimateSize(GeneralUtil.dataSummaryForFlowSize);
 		}
+		
 		
 		/** measurment for flow spreads **/
 		for (int i : spreadMeasurementConfig) {
-			for(int l=0;l<periodsarray[1].length;l++) {
-				GeneralUtil.periods=periodsarray[1][l];
-			for(int i1=0;i1<Marray[1].length;i1++) {
-				M=Marray[1][i1]*1024*1024;
-				switch (i) {
-				case 1:
-					for(int j=0;j<virtualArrayLengtharray[1].length;j++) {
-						virtualArrayLength=virtualArrayLengtharray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[1].length;j++) {
-						mValueFM=mValueFMarray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[1].length;j++) {			
-						mValueHLL=mValueHLLarray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				default:break;
-				}
-			}
-			}
+				initSharing(i);
+				initJoining(i);
+				encodeSpread(GeneralUtil.dataStreamForFlowSpread);
+			  estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
 		}
 		System.out.println("DONE!!!!!!!!!!!");
 	}
+	
+	// Init the vSketch noise approach for different elementary data structures.
 	public static void initJoining(int index) {
 		switch (index) {
 	        case 0:  B = new Counter[1]; B[0]=new Counter(mValueCounter,counterSize); 
 	                 break;
-	        case 1:  B = new Bitmap[1]; B[0] = new Bitmap(virtualArrayLength);
+	        case 1:  B = new Bitmap[1]; B[0] = new Bitmap(M);
 	                 break;
 	        case 2:  B = new FMsketch[1]; B[0] = new FMsketch(mValueFM, FMsketchSize);
 	                 break;
@@ -163,8 +90,7 @@ public class GeneralvSkt {
 	                 break;
 	        default: break;
 		}
-		//generateSharingRandomSeeds();
-		System.out.println("\nVSkt-" + C[0].getDataStructureName() + " Initialized!");
+		System.out.println("vSkt(" + C[0].getDataStructureName() + ") Initialized!");
 	}
 	// Init the sharing approach for different elementary data structures.
 	public static void initSharing(int index) {
@@ -179,11 +105,10 @@ public class GeneralvSkt {
 	                 break;
 	        default: break;
 		}
-		generateSharingRamdonSeeds();
-		System.out.println("\nSharing Data Structures Initialized!");
+		generatevSketchRamdonSeeds();
 	}
 	
-	// Generate couter sharing data structures for flow size measurement.
+	// Generate vSkt(counter) for flow size measurement.
 	public static Counter[] generateCounter() {
 		m = mValueCounter;
 		u = counterSize;
@@ -191,15 +116,15 @@ public class GeneralvSkt {
 		Counter[] B = new Counter[1];
 		B[0] = new Counter(w, counterSize);
 		
-		Counter[][] BP = new Counter[GeneralUtil.periods][1];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		Counter[][] BP = new Counter[periods][1];
+		for(int t = 0; t < periods; t++) {
 			BP[t][0] = new Counter(w, counterSize);
 		}
 		CP = BP;
 		return B;
 	}
 		
-	// Generate bit sharing data structures for flow cardinality measurement.
+	// Generate vSkt(bitmap) for flow size/spread measurement.
 	public static Bitmap[] generateBitmap() {
 		m = virtualArrayLength;
 		u = bitmapSize;
@@ -207,8 +132,8 @@ public class GeneralvSkt {
 		Bitmap[] B = new Bitmap[1];
 		B[0] = new Bitmap(w);
 		
-		Bitmap[][] BP = new Bitmap[GeneralUtil.periods][1];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		Bitmap[][] BP = new Bitmap[periods][1];
+		for(int t = 0; t < periods; t++) {
 			BP[t][0] = new Bitmap(w);
 		}
 		CP = BP;
@@ -216,7 +141,7 @@ public class GeneralvSkt {
 		return B;
 	}
 	
-	// Generate FM sketch sharing data structures for flow cardinality measurement.
+	// Generate vSkt(FM) for flow size/spread measurement.
 	public static FMsketch[] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize;
@@ -224,8 +149,8 @@ public class GeneralvSkt {
 		FMsketch[] B = new FMsketch[1];
 		B[0] = new FMsketch(w, FMsketchSize);
 		
-		FMsketch[][] BP = new FMsketch[GeneralUtil.periods][1];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		FMsketch[][] BP = new FMsketch[periods][1];
+		for(int t = 0; t < periods; t++) {
 			BP[t][0] = new FMsketch(w, FMsketchSize);
 		}
 		CP = BP;
@@ -233,7 +158,7 @@ public class GeneralvSkt {
 		return B;
 	}
 	
-	// Generate register sharing data structures for flow cardinality measurement.
+	// Generate vSkt(HLL) for flow size/spread measurement.
 	public static HyperLogLog[] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize;
@@ -241,8 +166,8 @@ public class GeneralvSkt {
 		HyperLogLog[] B = new HyperLogLog[1];
 		B[0] = new HyperLogLog(w, HLLSize);
 		
-		HyperLogLog[][] BP = new HyperLogLog[GeneralUtil.periods][1];
-		for(int t = 0; t < GeneralUtil.periods; t++) {
+		HyperLogLog[][] BP = new HyperLogLog[periods][1];
+		for(int t = 0; t < periods; t++) {
 			BP[t][0] = new HyperLogLog(w, HLLSize);
 		}
 		CP = BP;
@@ -251,7 +176,7 @@ public class GeneralvSkt {
 	}
 	
 	// Generate random seeds for Sharing approach.
-	public static void generateSharingRamdonSeeds() {
+	public static void generatevSketchRamdonSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		S = new int[m];
 		int num = m;
@@ -265,27 +190,25 @@ public class GeneralvSkt {
 		}
 	}
 
-	/** Encode elements to the physical data structure for flow size measurment. */
+	/** Encode elements to vSketch for flow size measurement. */
 	public static void encodeSize(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0].getDataStructureName().toUpperCase() + "s..." );
-		//Scanner sc = new Scanner(new File(filePath));
 		n = 0;
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));
 
 			System.out.println("Input file: " + filePath + "output"+t+"v.txt" );
 			while (sc.hasNextLine()) {
 				String entry = sc.nextLine();
 				String[] strs = entry.split("\\s+");
-				//String flowid = GeneralUtil.getSizeFlowID(strs, true);
-				long flowid=GeneralUtil.getSize1FlowID(strs, true);
-		        n++;
-				
-		        CP[t][0].encodeSegment(flowid, S, w / m);
+				long flowid = GeneralUtil.getSize1FlowID(strs, true);
+		    n++;
+				// segment encode, number of segments
+		    CP[t][0].encodeSegment(flowid, S, w / m);
 			}
 			sc.close();
 		}
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			C[0] = C[0].join(CP[t][0]);
 		}
 		System.out.println("Total number of encoded pakcets: " + n);
@@ -295,23 +218,18 @@ public class GeneralvSkt {
 	/** Estiamte flow sizes. */
 	public static void estimateSize(String filePath) throws FileNotFoundException {
 		System.out.println("Estimating Flow SIZEs..." ); 
-		Scanner sc = new Scanner(new File(filePath + GeneralUtil.periods + "\\outputsrcDstCount.txt"));
-		System.out.println(filePath + GeneralUtil.periods + "\\outputsrcDstCount.txt");
+		Scanner sc = new Scanner(new File(filePath + periods + "\\outputsrcDstCount.txt"));
+		System.out.println(filePath + periods + "\\outputsrcDstCount.txt");
 		
 		String resultFilePath = GeneralUtil.path + "VSketch\\size\\v" + C[0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m + "_TT_" + GeneralUtil.periods;
+				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m + "_TT_" + periods;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("Result directory: " + resultFilePath); 
 		for (int t = 0; t < m; t++) {
 			B[0] = B[0].join(C[0],w/m,t);
 		}
-		int totalSum1 = B[0].getValue();
-		
-		// Get the estimate of the physical data structure.
-		int totalSum = C[0].getValue();
-		if(C[0].getDataStructureName().equals("Bitmap")) {
-			totalSum1=totalSum;
-		}
+		// Estimate noise.
+		int totalSum = B[0].getValue();
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
@@ -319,9 +237,7 @@ public class GeneralvSkt {
 			int num = Integer.parseInt(strs[strs.length-1]);
 				// Get the estimate of the virtual data structure.
 				int virtualSum = C[0].getValueSegment(flowid, S, w / m);
-				//System.out.println(num + "\t" + virtualSum);
-				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum1 / w), 1);
-				
+				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum / w), 1);			
 				if (estimate < 0.0) {
 					estimate = 1.0;
 				}
@@ -331,13 +247,12 @@ public class GeneralvSkt {
 		pw.close();
 	}
 
-	/** Encode elements to the physical data structure for flow spread measurment. */
+	/** Encode elements to vSketch for flow spread measurement. */
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0].getDataStructureName().toUpperCase() + "s..." );
 		n = 0;
-		for (int t = 0; t < GeneralUtil.periods; t++) {
-			Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));
-			
+		for (int t = 0; t < periods; t++) {
+			Scanner sc = new Scanner(new File(filePath + "output"+t+"v.txt"));			
 			System.out.println("Input file: " + filePath + "output"+t+"v.txt" );
 			while (sc.hasNextLine()) {
 				String entry = sc.nextLine();
@@ -350,7 +265,7 @@ public class GeneralvSkt {
 			}
 			sc.close();
 		}
-		for (int t = 0; t < GeneralUtil.periods; t++) {
+		for (int t = 0; t < periods; t++) {
 			C[0] = C[0].join(CP[t][0]);
 		}
 		System.out.println("Total number of encoded pakcets: " + n); 
@@ -360,39 +275,30 @@ public class GeneralvSkt {
 	/** Estiamte flow spreads. */
 	public static void estimateSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Estimating Flow CARDINALITY..." ); 
-		Scanner sc = new Scanner(new File(filePath + GeneralUtil.periods + "\\outputdstCard.txt"));
-		System.out.println(filePath + GeneralUtil.periods + "\\outputdstCard.txt");
+		Scanner sc = new Scanner(new File(filePath + periods + "\\outputdstCard.txt"));
+		System.out.println(filePath + periods + "\\outputdstCard.txt");
 		
 		String resultFilePath = GeneralUtil.path + "VSketch\\spread\\v" + C[0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m + "_TT_" + GeneralUtil.periods;
+				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m + "_TT_" + periods;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("Result directory: " + resultFilePath); 
 		for (int t = 0; t < m; t++) {
 			B[0] = B[0].join(C[0],w/m,t);
 		}
-		int totalSum1 = B[0].getValue();
-		// Get the estimate of the physical data structure.
-		int totalSum = C[0].getValue();
-		if(C[0].getDataStructureName().equals("Bitmap")) {
-			totalSum1=totalSum;
-		}
-		
+		// Estimate noise.
+		int totalSum = B[0].getValue();
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
-			//String flowid = GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0];
 			long flowid=Long.parseLong(GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0]);
 			int num = Integer.parseInt(strs[strs.length-1]);
-			//if (rand.nextDouble() <= GeneralUtil.getSpreadSampleRate(num)) {
 				// Get the estimate of the virtual data structure.
 				int virtualSum = C[0].getValueSegment(flowid, S, w / m);
-				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum1 / w), 1);
-
+				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum / w), 1);
 				if (estimate < 0.0) {
 					estimate = 1.0;
 				}
 				pw.println(entry + "\t" + estimate.intValue());
-			//}
 		}
 		sc.close();
 		pw.close();
