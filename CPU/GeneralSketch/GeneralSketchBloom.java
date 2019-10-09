@@ -208,7 +208,7 @@ public class GeneralSketchBloom {
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
-			String[] res = GeneralUtil.getSperadFlowIDAndElementID(strs, true);
+			String[] res = GeneralUtil.getSpreadFlowIDAndElementID(strs, true);
 			String flowid = res[0];
 			String elementid = res[1];
 			n++;
@@ -232,7 +232,7 @@ public class GeneralSketchBloom {
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
-			String flowid = GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0];
+			String flowid = GeneralUtil.getSpreadFlowIDAndElementID(strs, false)[0];
 			int num = Integer.parseInt(strs[strs.length-1]);
 			int estimate = Integer.MAX_VALUE;
 				
