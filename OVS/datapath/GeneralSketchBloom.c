@@ -1,14 +1,11 @@
 #include "GeneralSketchBloom.h"
-#include <linux/fs.h>
-#include <asm/segment.h>
-#include <linux/buffer_head.h>
 
 /** parameters for count-min */
 const int d = 4; 			// the nubmer of rows in Count Min
 
 GeneralSketchBloom *initSketchBloom(int sketchName)
 {
-	int M = 1024* 1024 * 4; 	// total memory space Mbits	
+	int M = 1024 * 1024 * 4; 	// total memory space Mbits	
 
 	
 	/** parameters for counter */
@@ -104,8 +101,6 @@ void generateSketchBloomRandomSeeds(GeneralSketchBloom *GSB)
 		*(GSB->S + i) = rand();
 	}
 }
-
-
 
 //void getThroughput()
 //{

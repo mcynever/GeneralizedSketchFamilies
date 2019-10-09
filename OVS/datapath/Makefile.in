@@ -398,12 +398,10 @@ build_modules = $(both_modules)	# Modules to build
 dist_modules = $(both_modules)	# Modules to distribute
 openvswitch_sources = actions.c conntrack.c datapath.c dp_notify.c \
 	flow.c flow_netlink.c flow_table.c vport.c \
-	vport-internal_dev.c vport-netdev.c nsh.c meter.c countmax.c \
-	sketch_report.c Bitmap.c Counter.c FMsketch.c \
-	GeneralSketchBloom.c GeneralUtil.c GeneralVSketch.c \
-	HyperLogLog.c linux/compat/dev-openvswitch.c \
-	linux/compat/dst_cache.c linux/compat/exthdrs_core.c \
-	linux/compat/geneve.c linux/compat/gre.c linux/compat/gso.c \
+	vport-internal_dev.c vport-netdev.c nsh.c meter.c \
+	linux/compat/dev-openvswitch.c linux/compat/dst_cache.c \
+	linux/compat/exthdrs_core.c linux/compat/geneve.c \
+	linux/compat/gre.c linux/compat/gso.c \
 	linux/compat/genetlink-openvswitch.c \
 	linux/compat/inet_fragment.c linux/compat/ip_gre.c \
 	linux/compat/ip_fragment.c linux/compat/ip_output.c \
@@ -427,9 +425,7 @@ vport_stt_sources = vport-stt.c
 nsh_sources = nsh.c
 openvswitch_headers = compat.h conntrack.h datapath.h flow.h \
 	flow_netlink.h flow_table.h vport.h vport-internal_dev.h \
-	vport-netdev.h meter.h Bitmap.h Counter.h FMsketch.h \
-	GeneralSketchBloom.h GeneralUtil.h GeneralVSketch.h \
-	HyperLogLog.h linux/compat/gso.h \
+	vport-netdev.h meter.h linux/compat/gso.h \
 	linux/compat/include/linux/percpu.h \
 	linux/compat/include/linux/bug.h \
 	linux/compat/include/linux/cache.h \

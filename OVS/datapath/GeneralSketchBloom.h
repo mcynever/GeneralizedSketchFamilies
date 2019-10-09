@@ -27,5 +27,4 @@ GeneralSketchBloom *initSketchBloom(int sketchName);
 
 void generateSketchBloomRandomSeeds(GeneralSketchBloom *GSB);
 
-
 #endif

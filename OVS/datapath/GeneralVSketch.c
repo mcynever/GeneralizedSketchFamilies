@@ -1,7 +1,4 @@
 #include "GeneralVSketch.h"
-#include <linux/fs.h>
-#include <asm/segment.h>
-#include <linux/buffer_head.h>
 
 
 GeneralVSketch *initVSketch(int sketchName)
@@ -73,4 +70,3 @@ void generateVSketchRandomSeeds(GeneralVSketch *GVS)
 		*(GVS->S + i) = rand();
 	}
 }
-

@@ -2585,8 +2585,6 @@ error:
 
 static void dp_cleanup(void)
 {
-	//sketch_report_clean();
-	//delete_countmax_sketch(countmax);
 	dp_unregister_genl(ARRAY_SIZE(dp_genl_families));
 	ovs_netdev_exit();
 	unregister_netdevice_notifier(&ovs_dp_device_notifier);

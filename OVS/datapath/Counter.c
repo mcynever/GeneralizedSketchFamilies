@@ -10,6 +10,7 @@ Counter *newCounter(int m, int size) {
 	for (i = 0; i < m; i++) {
 		c->counters[i] = 0;
 	}
+	// printf("%s\n", "This is a counter");
 	return c;
 }
 
@@ -19,6 +20,7 @@ void encodeCounter(const Counter *c) { // c is null
 	int k = r % c->m;
 	if(!c->counters){printk(KERN_WARNING"c->counter is NULL!\n"); return;}	
 	c->counters[k]++;
+	// printf("%s\n", "This is a Counter");
 }
 
 void encodeCounterEID(const Counter *c, int elementID) {
@@ -29,7 +31,7 @@ void encodeCounterEID(const Counter *c, int elementID) {
 void encodeCounterSegment(const Counter *c, int flowID, int *s, int w) {
 	int ms = c->m / w;
 	int r = rand();
-	int j = r % ms;	
+	int j = r % ms;			// (GeneralUtil::intHash(flowID) % ms + ms) % ms;							// rand() % ms;
 	int k = (intHash(flowID ^ s[j]) % w + w) % w;
 	int i = j * w + k;
 	c->counters[i]++;

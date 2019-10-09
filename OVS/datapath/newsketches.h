@@ -4,9 +4,9 @@
 #include "GeneralSketchBloom.h"
 #include "GeneralVSketch.h"
 #define MY_SKETCH
-static int sketch_name = 1;
-static int GSB_or_GVS = 0;
-static int size_or_spread = 0;
+static int sketch_name = 3;
+static int GSB_or_GVS = 1;
+static int size_or_spread = 1;
 
 typedef void (*GSB_size_t)(void* c);
 typedef void (*GSB_spread_t)(void* c, int src);
@@ -36,7 +36,6 @@ static const GVS_spread_t gvs_spread_f[] = {
 	(GVS_spread_t)encodeFMsketchSegmentEID,
 	(GVS_spread_t)encodeHyperLogLogSegmentEID,
 };
-
 static inline void print_sketch_mode(void){
 	char* sname[] = {"0-counter", "1-bitmap", "2-FMsketch", "3-HLL"};
 	char* smode[] = {"SketchBloom", "VSketch"};

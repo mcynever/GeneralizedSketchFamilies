@@ -50,7 +50,6 @@ void encodeHyperLogLogEID(const HyperLogLog *b, int elementID) {
 	if (getBitsetValue(b->HLL[k]) < leadingZeros) {
 		setBitsetValue(b, k, leadingZeros);
 	}
-	//printf("%s\n", "This is a HyperLogLog");
 }
 
 void encodeHyperLogLogSegment(const HyperLogLog *b, int flowID, int *s, int w) {
