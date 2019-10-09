@@ -67,7 +67,7 @@ public class GeneralSketchBloom {
 		System.out.println("DONE!****************************");
 	}
 
-	// Generate bSketch(counter) for flow size measurement.
+	// Generate bSkt(counter) for flow size measurement.
 	public static Counter[][] generateCounter() {
 		m = mValueCounter;
 		u = counterSize * mValueCounter;
@@ -81,7 +81,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate bSketch(bitmap) for flow size/spread measurement.
+	// Generate bSkt(bitmap) for flow size/spread measurement.
 	public static Bitmap[][] generateBitmap() {
 		m = bitArrayLength;
 		u = bitArrayLength;
@@ -95,7 +95,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate bSketch(FMsketch) for flow size/spread measurement.
+	// Generate bSkt(FMsketch) for flow size/spread measurement.
 	public static FMsketch[][] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize * mValueFM;
@@ -109,7 +109,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate bSketch(HLL) for flow size/spread measurement.
+	// Generate bSkt(HLL) for flow size/spread measurement.
 	public static HyperLogLog[][] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize * mValueHLL;
@@ -137,7 +137,7 @@ public class GeneralSketchBloom {
 		default: break;
 		}
 		generateCMRandomSeeds();
-		System.out.println("\nSketchBloom-" + C[0][0].getDataStructureName() + " Initialized!-----------");
+		System.out.println("bSket(" + C[0][0].getDataStructureName() + ") Initialized!-----------");
 	}
 	
 	// Generate random seeds for bSketch.
@@ -222,7 +222,7 @@ public class GeneralSketchBloom {
 	}
 
 	/** Estimate flow spreads. */
-	public static void estimateSpread(String filepath) throws FileNotFoundException {
+	public static void estimateSprea(String filepath) throws FileNotFoundException {
 		System.out.println("Estimating Flow CARDINALITY..." ); 
 		Scanner sc = new Scanner(new File(filepath));
 		String resultFilePath = GeneralUtil.path + "BSketch\\spread\\" + C[0][0].getDataStructureName()

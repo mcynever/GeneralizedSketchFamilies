@@ -83,10 +83,11 @@ public class GeneralvSkt {
 	                 break;
 	        default: break;
 		}
-		generateSharingRandomSeeds();
+		generatevSketchRandomSeeds();
 		System.out.println("vSketch(" + C[0].getDataStructureName() + ") Initialized!");
 	}
 	
+	// Init the vSketch noise approach for different elementary data structures.
 	public static void initJoining(int index) {
 		switch (index) {
 	        case 0:  B = new Counter[1]; B[0]=new Counter(mValueCounter,counterSize); 
@@ -101,7 +102,7 @@ public class GeneralvSkt {
 		}
 	}
 	
-	// Generate vSketch(counter) for flow size measurement.
+	// Generate vSkt(counter) for flow size measurement.
 	public static Counter[] generateCounter() {
 		m = mValueCounter;
 		u = counterSize;
@@ -111,7 +112,7 @@ public class GeneralvSkt {
 		return B;
 	}
 		
-	// Generate vSketch(bitmap) for flow size/spread measurement.
+	// Generate vSkt(bitmap) for flow size/spread measurement.
 	public static Bitmap[] generateBitmap() {
 		m = virtualArrayLength;
 		u = bitmapSize;
@@ -121,7 +122,7 @@ public class GeneralvSkt {
 		return B;
 	}
 	
-	// Generate vSketch(FM) for flow size/spread measurement.
+	// Generate vSkt(FM) for flow size/spread measurement.
 	public static FMsketch[] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize;
@@ -131,7 +132,7 @@ public class GeneralvSkt {
 		return B;
 	}
 	
-	// Generate vSketch(HLL) for flow size/spread measurement.
+	// Generate vSkt(HLL) for flow size/spread measurement.
 	public static HyperLogLog[] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize;
@@ -142,7 +143,7 @@ public class GeneralvSkt {
 	}
 	
 	// Generate random seeds for vSketch.
-	public static void generateSharingRandomSeeds() {
+	public static void generatevSketchRandomSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		S = new int[m];
 		int num = m;
@@ -165,9 +166,9 @@ public class GeneralvSkt {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
 			long flowid = GeneralUtil.getSize1FlowID(strs, true);
-	        n++;
+	    n++;
 			// segment encode, number of segments
-	        C[0].encodeSegment(flowid, S, w / m);
+	    C[0].encodeSegment(flowid, S, w / m);
 		}
 		System.out.println("Total number of encoded pakcets: " + n);
 		sc.close();
@@ -205,7 +206,7 @@ public class GeneralvSkt {
 		pw.close();
 	}
 
-	/** Encode elements to the physical data structure for flow spread measurement. */
+	/** Encode elements to the vSketch for flow spread measurement. */
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0].getDataStructureName().toUpperCase() + "s for flow spread measurement..." );
 		Scanner sc = new Scanner(new File(filePath));
