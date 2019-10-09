@@ -194,7 +194,7 @@ public class Bitmap extends GeneralDataStructure{
 		Bitmap b = (Bitmap) gds;
 		for(int j=0;j<w;j++)
 			if((b.getBitmaps().get(i*w+j))){
-				B.set(i);
+				B.set(i*w+j);
 				break;
 			}
 		return this;
