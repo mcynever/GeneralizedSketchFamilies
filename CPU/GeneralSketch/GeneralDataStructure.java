@@ -1,13 +1,12 @@
 import java.util.BitSet;
 import java.util.Random;
 
-/** General data sturcture prototype for a unit data structure, such as counter, bitmap, etc. */
+/** An abstract class which defines APIs to access a unit data structure, such as counter, bitmap, etc. */
 public abstract class GeneralDataStructure {
 	// The random seed generator for this data structure.
 	public static Random rand = new Random();
 	// Default value for general setting.
-	public final static int DEFAULT_CONSTANT = -1;
-	
+	public final static int DEFAULT_CONSTANT = -1;	
 	
 	public GeneralDataStructure() {
 	}
@@ -22,7 +21,6 @@ public abstract class GeneralDataStructure {
 	public abstract int getValue();
 	
 	public abstract int[] getCounters();
-	
 	
 	public abstract BitSet getBitmaps();
 	
@@ -44,6 +42,7 @@ public abstract class GeneralDataStructure {
 	public abstract void encodeSegment(long flowID, long elementID, int[] s, int w);
 
 	public abstract void encodeSegment(int flowID, int elementId, int[] s, int w);
+	
 	public abstract void encodeSegment(long flowID, int[] s, int w);
 	
 	/** Get the value of the flow with flowID in the shared data structure. */
@@ -55,7 +54,9 @@ public abstract class GeneralDataStructure {
 	}
 	
 	public abstract GeneralDataStructure join(GeneralDataStructure gds,int w,int i) ;
+	
 	public abstract GeneralDataStructure[] getsplit(int m,int w);
+	
 	/** Encode an element in the flow with flowID to the shared data structure (in segment) for size measurement. 
 	 * @w number of segments
 	 * */
