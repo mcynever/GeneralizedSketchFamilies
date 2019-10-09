@@ -16,19 +16,19 @@ import java.util.Set;
  */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
 public class GeneralvSkt {
-public static Random rand = new Random();
+	public static Random rand = new Random();
 	
-	public static int n = 0; 						// total number of packets
+	public static int n = 0; 					// total number of packets
 	public static int flows = 0; 					// total number of flows
 	public static int avgAccess = 0; 				// average memory access for each packet
-	public static int M = 1024 * 1024 * 16; 	// total memory space Mbits
+	public static int M = 1024 * 1024 * 16; 			// total memory space Mbits
 	public static GeneralDataStructure[] C;
 	public static GeneralDataStructure[] B;
 	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); // 0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList(3)); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	
-	/** parameters for sharing approach **/
-	public static int u = 1;			// the unit size of each virtual data structure
+	/** parameters for vSketch **/
+	public static int u = 1;			// the unit size of each data structure
 	public static int w;				// number of the unit data structures in the physical array
 	public static int m = 1;			// number of elementary data structures in the virtual data structure
 	public static int[] S; 				// random seeds for the sharing approach
@@ -49,111 +49,28 @@ public static Random rand = new Random();
 	public static int mValueHLL = 128;
 	public static int HLLSize = 5;
 	
-	public static int times = 1;
-	
-	/** number of runs for throughput measurement */
-	public static int loops = 10;
-	public static int Mbase=1024*1024;
-	public static int[][] Marray= {{2,4,8,16},{300}};
-	public static int[][]	mValueCounterarray= {{1},{1}};
-	public static int[][] virtualArrayLengtharray= {{50000},{5000}};
-	public static int[][] mValueFMarray= {{64},{128}};
-	public static int[][] mValueHLLarray= {{128},{512}};
-	public static long c1=0;
-	public static long c2=0;
 	public static void main(String[] args) throws FileNotFoundException {
-		/** measurment for flow sizes **/
 		System.out.println("Start************************");
-		Random random=new Random();
-		c1=random.nextLong();
-		c2=random.nextLong();
+
 		/** measurment for flow sizes **/
 		for (int i : sizeMeasurementConfig) {
-			for(int i1=0;i1<Marray[0].length;i1++) {
-				M=Marray[0][i1]*Mbase;
-				switch (i) {
-				case 0:
-				   for(int j=0;j<mValueCounterarray[0].length;j++) {
-					   mValueCounter=mValueCounterarray[0][j];
-					   initSharing(i);
-					   initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-				   }
-				   break;
-				case 1:
-					for(int j=0;j<virtualArrayLengtharray[0].length;j++) {
-						virtualArrayLength=virtualArrayLengtharray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[0].length;j++) {
-						mValueFM=mValueFMarray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[0].length;j++) {			
-						mValueHLL=mValueHLLarray[0][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-						estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				default:break;
-				}
-			}
+			initSharing(i);
+			initJoining(i);
+			encodeSize(GeneralUtil.dataStreamForFlowSize);
+			estimateSize(GeneralUtil.dataSummaryForFlowSize);
 		}
 		
 		/** measurment for flow spreads **/
 		for (int i : spreadMeasurementConfig) {
-			for(int i1=0;i1<Marray[1].length;i1++) {
-				M=Marray[1][i1]*Mbase;
-				switch (i) {
-				case 1:
-					for(int j=0;j<virtualArrayLengtharray[1].length;j++) {
-						virtualArrayLength=virtualArrayLengtharray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[1].length;j++) {
-						mValueFM=mValueFMarray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[1].length;j++) {			
-						mValueHLL=mValueHLLarray[1][j];
-						initSharing(i);
-						initJoining(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				default:break;
-				}
-			}
-			
+			initSharing(i);
+			initJoining(i);
+			encodeSpread(GeneralUtil.dataStreamForFlowSpread);
+			estimateSpread(GeneralUtil.dataSummaryForFlowSpread);			
 		}
 		System.out.println("DONE!!!!!!!!!!!");
 	}
 	
-	// Init the VSketch approach for different elementary data structures.
+	// Init the vSketch approach for different elementary data structures.
 	public static void initSharing(int index) {
 		switch (index) {
 	        case 0:  C = generateCounter(); 
@@ -167,7 +84,7 @@ public static Random rand = new Random();
 	        default: break;
 		}
 		generateSharingRandomSeeds();
-		System.out.println("\nVSkt-" + C[0].getDataStructureName() + " Initialized!");
+		System.out.println("vSketch(" + C[0].getDataStructureName() + ") Initialized!");
 	}
 	
 	public static void initJoining(int index) {
@@ -183,10 +100,10 @@ public static Random rand = new Random();
 	        default: break;
 		}
 		//generateSharingRandomSeeds();
-		System.out.println("\nVSkt-" + C[0].getDataStructureName() + " Initialized!");
+		System.out.println("vSketch(" + C[0].getDataStructureName() + ") Initialized!");
 	}
 	
-	// Generate counter sharing data structures for flow size measurement.
+	// Generate vSketch(counter) for flow size measurement.
 	public static Counter[] generateCounter() {
 		m = mValueCounter;
 		u = counterSize;
@@ -196,7 +113,7 @@ public static Random rand = new Random();
 		return B;
 	}
 		
-	// Generate bit sharing data structures for flow cardinality measurement.
+	// Generate vSketch(bitmap) for flow size/spread measurement.
 	public static Bitmap[] generateBitmap() {
 		m = virtualArrayLength;
 		u = bitmapSize;
@@ -206,7 +123,7 @@ public static Random rand = new Random();
 		return B;
 	}
 	
-	// Generate FM sketch sharing data structures for flow cardinality measurement.
+	// Generate vSketch(FM) for flow size/spread measurement.
 	public static FMsketch[] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize;
@@ -216,7 +133,7 @@ public static Random rand = new Random();
 		return B;
 	}
 	
-	// Generate register sharing data structures for flow cardinality measurement.
+	// Generate vSketch(HLL) for flow size/spread measurement.
 	public static HyperLogLog[] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize;
@@ -226,13 +143,7 @@ public static Random rand = new Random();
 		return B;
 	}
 	
-	public static HyperLogLog[] generateHyperLogLog(int m,int HLLSize) {
-		HyperLogLog[] B = new HyperLogLog[1];
-		B[0] = new HyperLogLog(m, HLLSize);
-		return B;
-	}
-	
-	// Generate random seeds for Sharing approach.
+	// Generate random seeds for vSketch.
 	public static void generateSharingRandomSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		S = new int[m];
@@ -247,7 +158,7 @@ public static Random rand = new Random();
 		}
 	}
 
-	/** Encode elements to the physical data structure for flow size measurement. */
+	/** Encode elements to vSketch for flow size measurement. */
 	public static void encodeSize(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0].getDataStructureName().toUpperCase() + "s for flow size measurement..." );
 		Scanner sc = new Scanner(new File(filePath));
@@ -275,35 +186,22 @@ public static Random rand = new Random();
 		System.out.println("Result directory: " + resultFilePath); 
 		
 		for (int t = 0; t < m; t++) {
-			B[0] = B[0].join(C[0],w/m,t);
+			B[0] = B[0].join(C[0], w/m, t);
 		}
-		int totalSum1=B[0].getValue();
-		int totalSum = C[0].getValue();
-		if(C[0].getDataStructureName().equals("Bitmap")) {
-			totalSum1=totalSum;
-		}
-	//	System.out.println("total spreads1: " + totalSum1);
-		
-		// Get the estimate of the physical data structure.
-		
-	//	System.out.println("total spreads: " + totalSum);
-		int rr=0;
+		// Estimate noise.
+		int totalSum=B[0].getValue();
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
 			long flowid = GeneralUtil.getSize1FlowID(strs, true);
 			int num = Integer.parseInt(strs[strs.length-1]);
-				// Get the estimate of the virtual data structure.
-				// encode segments, number of segments: w / m
-				int virtualSum = C[0].getValueSegment(flowid, S, w / m);
-				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum1 / w), 1);
-				Double threshold = 0.0;
-				int sample_ratio = 16;
-				if (estimate < threshold) {
-					estimate=1.0;
-				}
-				pw.println(entry + "\t" + estimate.intValue());
-				rr++;
+			// Get the estimate of the virtual data structure.
+			int virtualSum = C[0].getValueSegment(flowid, S, w / m);
+			Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum / w), 1);
+			if (estimate < 0.0) {
+				estimate=1.0;
+			}
+			pw.println(entry + "\t" + estimate.intValue());
 		}
 		sc.close();
 		pw.close();
@@ -313,8 +211,7 @@ public static Random rand = new Random();
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0].getDataStructureName().toUpperCase() + "s for flow spread measurement..." );
 		Scanner sc = new Scanner(new File(filePath));
-		//n = 0;
-		int nnn=0;
+		n = 0;
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
@@ -337,37 +234,27 @@ public static Random rand = new Random();
 		for (int t = 0; t < m; t++) {
 			B[0] = B[0].join(C[0],w/m,t);
 		}
-		System.out.println("Result directory: " + resultFilePath); 
-		int totalSum1=B[0].getValue();
-		// Get the estimate of the physical data structure.
-		int totalSum = C[0].getValue();
-		if(C[0].getDataStructureName().equals("Bitmap")) {
-			totalSum1=totalSum;
-		}
-	//	System.out.println("total spreads1: " + totalSum1);
-	//	System.out.println("total spreads: " + totalSum);
-		n=0;
-		int rr=0;
+		System.out.println("Result directory: " + resultFilePath);
+		// Estimate noise.
+		int totalSum = B[0].getValue();
+		n = 0;
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
 			long flowid = Long.parseLong(GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0]);
 			int num = Integer.parseInt(strs[strs.length-1]);
-			n+=num;
-				int virtualSum = C[0].getValueSegment(flowid, S, w / m);
-				Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum1 / w), 1);
-
-				rr++;
-				int sample_ratio = 16;
-				if (estimate < 0.0) {
-					estimate=1.0;
-				}
-				pw.println(entry + "\t" + estimate.intValue());
+			n += num;
+			int virtualSum = C[0].getValueSegment(flowid, S, w / m);
+			Double estimate = Math.max(1.0 * (virtualSum - 1.0 * m * totalSum / w), 1);
+			if (estimate < 0.0) {
+				estimate = 1.0;
+			}
+			pw.println(entry + "\t" + estimate.intValue());
 		}
 		sc.close();
 		pw.close();
 		// obtain estimation accuracy results
-		System.out.println("total flow spread="+n);
+		System.out.println("Total flow spread: " + n);
 	}
 	
 }
