@@ -3,8 +3,9 @@ Code for Generalized Sketch Families for Network Traffic Measurement (Sigmetrics
 
 An example of data traces that are accepted is given in /data and the measurement results are given in /result.
 
-CPU: 
-    1.GeneralSketch floder contains code for flow size/spread measurement for  
+CPU: Code using java for Generalized Sketch Families
+
+     1.GeneralSketch floder contains code for flow size/spread measurement for  
       bSketch(GeneralSketchBloom.java)/cSketch(GeneralCountMin.java)/vSketch(GeneralvSkt.java). 
        
      2.GeneralUnion floder contains code for Spitial Join Experiment. The input data should be under data/union/. splitlni means data for        joining of i data trace and outputiv.txt means ith input data trace. Statistic results srcdstsize.txt and dstspread.txt should be 
