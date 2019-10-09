@@ -10,34 +10,31 @@ import java.util.Set;
 
 /** 
  * A general framework for bSketch family. The elementary data structures to be plugged into can be counter, bitmap, FM sketch, HLL sketch. Specifically, we can
- * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow spreads.
+ * use counter to estimate flow sizes, and use bitmap, FM sketch and HLL sketch to estimate flow sizes/spreads.
  * @author Youlin
  */
 
 public class GeneralSketchBloom {
 	public static Random rand = new Random();
 
-	public static int n = 0; 						// total number of packets
+	public static int n = 0; 					// total number of packets
 	public static int flows = 0; 					// total number of flows
 	public static int avgAccess = 0; 				// average memory access for each packet
-	public static  int M = 1024 * 1024* 8; 	// total memory space Mbits	
+	public static  int M = 1024 * 1024* 8; 				// total memory space Mbits	
 	public static GeneralDataStructure[][] C;
 	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); //  0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList()); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
-	public static Set<Integer> expConfig = new HashSet<>(Arrays.asList()); //0-ECountMin dist exp
-	public static boolean isGetThroughput = false;
 
-	/** parameters for count-min */
-	public static final int d = 4; 			// the number of rows in Count Min
-	public static int w = 1;				// the number of columns in Count Min
-	public static int u = 1;				// the size of each elementary data structure in Count Min.
-	public static int[] S = new int[d];		// random seeds for Count Min
-	public static int m = 1;				// number of bit/register in each unit (used for bitmap, FM sketch and HLL sketch)
-
+	/** parameters for bSketch */
+	public static final int d = 4; 			// the number of estimators for each flow in bSketch
+	public static int w = 1;			// the number of arrays in bSketch
+	public static int u = 1;			// the size of each elementary data structure in Count Min.
+	public static int[] S = new int[d];		// random seeds for bSketch
+	public static int m = 1;			// number of bits/registers in each unit (used for bitmap, FM sketch and HLL sketch)
 
 	/** parameters for counter */
-	public static int mValueCounter = 1;			// only one counter in the counter data structure
-	public static int counterSize = 32;				// size of each unit
+	public static int mValueCounter = 1;		// only one counter in the counter data structure
+	public static int counterSize = 32;		// size of each unit
 
 	/** parameters for bitmap */
 	public static  int bitArrayLength = 5000;
@@ -49,120 +46,28 @@ public class GeneralSketchBloom {
 	/** parameters for HLL sketch **/
 	public static int mValueHLL = 128;
 	public static  int HLLSize = 5;
-
-	public static int times = 1;
 	
-	/** number of runs for throughput measurement */
-	public static int loops = 100;
-	public static int Mbase=1024*1024;
-	public static int[][] Marray= {{2,4,8,16},{16}};
-	public static int[][]	mValueCounterarray= {{1},{1}};
-	public static int[][] bitArrayLengtharray= {{50000},{5000}};
-	public static int[][] mValueFMarray= {{128},{128}};
-	public static int[][] mValueHLLarray= {{128},{128}};
 	public static void main(String[] args) throws FileNotFoundException {
-		/** measurement for flow sizes **/
-		System.out.println("Start****************************");
-		
-		for (int i : sizeMeasurementConfig) {
-			for(int i1=0;i1<Marray[0].length;i1++) {
-				M=Marray[0][i1]*Mbase;
-				switch (i) {
-				case 0:
-				   for(int j=0;j<mValueCounterarray[0].length;j++) {
-					   mValueCounter=mValueCounterarray[0][j];
-					   initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-				   }
-				   break;
-				case 1:
-					for(int j=0;j<bitArrayLengtharray[0].length;j++) {
-						bitArrayLength=bitArrayLengtharray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[0].length;j++) {
-						mValueFM=mValueFMarray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[0].length;j++) {			
-						mValueHLL=mValueHLLarray[0][j];
-						initCM(i);
-						encodeSize(GeneralUtil.dataStreamForFlowSize);
-			        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-					}
-					break;
-				default:break;
-				}
-			}
-		}
-		
-		/** measurment for flow spreads **/
-		for (int i : spreadMeasurementConfig) {
-			for(int i1=0;i1<Marray[1].length;i1++) {
-				M=Marray[1][i1]*Mbase;
-				switch (i) {
-				case 1:
-					for(int j=0;j<bitArrayLengtharray[1].length;j++) {
-						bitArrayLength=bitArrayLengtharray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 2:	
-					for(int j=0;j<mValueFMarray[1].length;j++) {
-						mValueFM=mValueFMarray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				case 3:
-					for(int j=0;j<mValueHLLarray[1].length;j++) {			
-						mValueHLL=mValueHLLarray[1][j];
-						initCM(i);
-						encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-			    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
-					}
-					break;
-				default:break;
-				}
-			}
-			
-		}
-		
+		System.out.println("Start****************************");		
 		
 		/** measurement for flow sizes **/
 		for (int i : sizeMeasurementConfig) {
-			int time = 0;
-			for(int j = 0; j < times; j++) {
-				initCM(i);
-				encodeSize(GeneralUtil.dataStreamForFlowSize);
+			initCM(i);
+			encodeSize(GeneralUtil.dataStreamForFlowSize);
 	        	estimateSize(GeneralUtil.dataSummaryForFlowSize);
-	        	time++;
-			}
 		}
 
 		/** measurement for flow spreads **/
 		for (int i : spreadMeasurementConfig) {
 			initCM(i);
 			encodeSpread(GeneralUtil.dataStreamForFlowSpread);
-    		estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
+    			estimateSpread(GeneralUtil.dataSummaryForFlowSpread);
 		}
 
 		System.out.println("DONE!****************************");
 	}
 
-	// Generate counter base Counter Bloom for flow size measurement.
+	// Generate bSketch(counter) for flow size measurement.
 	public static Counter[][] generateCounter() {
 		m = mValueCounter;
 		u = counterSize * mValueCounter;
@@ -176,7 +81,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate bitmap base Bitmap Bloom for flow cardinality measurement.
+	// Generate bSketch(bitmap) for flow size/spread measurement.
 	public static Bitmap[][] generateBitmap() {
 		m = bitArrayLength;
 		u = bitArrayLength;
@@ -190,7 +95,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate FM sketch base FMsketch Bloom for flow cardinality measurement.
+	// Generate bSketch(FMsketch) for flow size/spread measurement.
 	public static FMsketch[][] generateFMsketch() {
 		m = mValueFM;
 		u = FMsketchSize * mValueFM;
@@ -204,7 +109,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Generate HLL sketch base HLL Bloom for flow cardinality measurement.
+	// Generate bSketch(HLL) for flow size/spread measurement.
 	public static HyperLogLog[][] generateHyperLogLog() {
 		m = mValueHLL;
 		u = HLLSize * mValueHLL;
@@ -218,7 +123,7 @@ public class GeneralSketchBloom {
 		return B;
 	}
 
-	// Init the Count Min for different elementary data structures.
+	// Init bSketch for different elementary data structures.
 	public static void initCM(int index) {
 		switch (index) {
 		case 0: case -1: C = generateCounter();
@@ -235,7 +140,7 @@ public class GeneralSketchBloom {
 		System.out.println("\nSketchBloom-" + C[0][0].getDataStructureName() + " Initialized!-----------");
 	}
 	
-	// Generate random seeds for Counter Min.
+	// Generate random seeds for bSketch.
 	public static void generateCMRandomSeeds() {
 		HashSet<Integer> seeds = new HashSet<Integer>();
 		int num = d;
@@ -249,7 +154,7 @@ public class GeneralSketchBloom {
 		}
 	}
 
-	/** Encode elements to the Count Min for flow size measurement. */
+	/** Encode elements to bSketch for flow size measurement. */
 	public static void encodeSize(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s for flow size measurement......" );
 		Scanner sc = new Scanner(new File(filePath));
@@ -294,7 +199,7 @@ public class GeneralSketchBloom {
 		pw.close();
 	}
 	
-	/** Encode elements to the Count Min for flow spread measurement. */
+	/** Encode elements to bSketch for flow spread measurement. */
 	public static void encodeSpread(String filePath) throws FileNotFoundException {
 		System.out.println("Encoding elements using " + C[0][0].getDataStructureName().toUpperCase() + "s for flow spread measurement......" );
 		Scanner sc = new Scanner(new File(filePath));
