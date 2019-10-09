@@ -5,9 +5,13 @@
 #include "GeneralVSketch.cuh"
 
 #define MY_SKETCH
+//number of test
 const int number_of_test = 7;
+//test sketch name 0-counter, 1-bitmap, 2-FMsketch, 3-HLL 
 static int sketch_name[number_of_test] =  {0,1,2,3,1,2,3};
+//test sketch type 0-bSketch, 1-vSketch
 static int GSB_or_GVS[number_of_test] =     {1,1,1,1,1,1,1};
+//test measurement type 0-size, 1-spread
 static int size_or_spread[number_of_test] = {0,0,0,0,1,1,1};
 
 typedef void(*GSB_size_t)(void* c);
