@@ -179,7 +179,7 @@ public class GeneralSketchBloom {
 		System.out.println("Estimating Flow SIZEs..." ); 
 		Scanner sc = new Scanner(new File(filePath));
 		String resultFilePath = GeneralUtil.path + "BSketch\\size\\" + C[0][0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m + "_T_" + times;
+				+ "_M_" +  M / 1024 / 1024 + "_d_" + d + "_u_" + u + "_m_" + m;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("w :" + w);
 		System.out.println("Result directory: " + resultFilePath); 

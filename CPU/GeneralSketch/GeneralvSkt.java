@@ -24,7 +24,7 @@ public class GeneralvSkt {
 	public static int M = 1024 * 1024 * 16; 			// total memory space Mbits
 	public static GeneralDataStructure[] C;
 	public static GeneralDataStructure[] B;
-	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(0)); // 0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
+	public static Set<Integer> sizeMeasurementConfig = new HashSet<>(Arrays.asList(1)); // 0-counter; 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	public static Set<Integer> spreadMeasurementConfig = new HashSet<>(Arrays.asList(3)); // 1-Bitmap; 2-FM sketch; 3-HLL sketch
 	
 	/** parameters for vSketch **/
@@ -91,7 +91,7 @@ public class GeneralvSkt {
 		switch (index) {
 	        case 0:  B = new Counter[1]; B[0]=new Counter(mValueCounter,counterSize); 
 	                 break;
-	        case 1:  B = new Bitmap[1]; B[0] = new Bitmap(virtualArrayLength);
+	        case 1:  B = new Bitmap[1]; B[0] = new Bitmap(M);
 	                 break;
 	        case 2:  B = new FMsketch[1]; B[0] = new FMsketch(mValueFM, FMsketchSize);
 	                 break;
@@ -99,8 +99,6 @@ public class GeneralvSkt {
 	                 break;
 	        default: break;
 		}
-		//generateSharingRandomSeeds();
-		System.out.println("vSketch(" + C[0].getDataStructureName() + ") Initialized!");
 	}
 	
 	// Generate vSketch(counter) for flow size measurement.
@@ -181,7 +179,7 @@ public class GeneralvSkt {
 		Scanner sc = new Scanner(new File(filePath));
 		System.out.println(filePath);
 		String resultFilePath = GeneralUtil.path + "VSketch\\size\\v" + C[0].getDataStructureName()
-				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m + "_T_" + times;;
+				+ "_M_" +  M / 1024 / 1024 + "_u_" + u + "_m_" + m;
 		PrintWriter pw = new PrintWriter(new File(resultFilePath));
 		System.out.println("Result directory: " + resultFilePath); 
 		
@@ -215,7 +213,7 @@ public class GeneralvSkt {
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
-			String[] res = GeneralUtil.getSperadFlowIDAndElementID(strs, true);
+			String[] res = GeneralUtil.getSpreadFlowIDAndElementID(strs, true);
 			long flowid = Long.parseLong(res[0]);
 			long elementid = Long.parseLong(res[1]);
 			C[0].encodeSegment(flowid, elementid, S, w / m);
@@ -241,7 +239,7 @@ public class GeneralvSkt {
 		while (sc.hasNextLine()) {
 			String entry = sc.nextLine();
 			String[] strs = entry.split("\\s+");
-			long flowid = Long.parseLong(GeneralUtil.getSperadFlowIDAndElementID(strs, false)[0]);
+			long flowid = Long.parseLong(GeneralUtil.getSpreadFlowIDAndElementID(strs, false)[0]);
 			int num = Integer.parseInt(strs[strs.length-1]);
 			n += num;
 			int virtualSum = C[0].getValueSegment(flowid, S, w / m);
