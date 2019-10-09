@@ -434,7 +434,7 @@ void cudaFreepacket1(unsigned int *data) {
 
 void experiment_start() {
 	uint32 len;
-	string filename = "..\\..\\data\\output1.txt";
+	string filename = "..\\..\\data\\srcdstsize.txt";
 	int number=10000000;
 	packetdata=readdata1(&number,filename,packetdata);
 	int *cudanumber;
