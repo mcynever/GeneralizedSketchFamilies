@@ -20,6 +20,6 @@ CPU: Code using java for Generalized Sketch Families
 FPGA:The two .zip file contains whole projects for bSketches and vSketches under xilinx vivado. The board we use is xilinx nexys A7-100T 
      development board. 
      
-GPU:The project under microsoft visual studio using cuda 10.0. Please change setting array in newsketch.cuh to change type.
+GPU:The project under microsoft visual studio using cuda 10.0. Please change setting array in newsketch.cuh to change test type.
     
 OVS: datapath folder in openvswitch-2.10.1.
