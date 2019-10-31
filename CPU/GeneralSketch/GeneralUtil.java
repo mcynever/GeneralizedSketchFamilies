@@ -8,16 +8,16 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-/** Util for general sketch families. */
+/** Some utility functions shared among general sketch families. */
 public class GeneralUtil {	
 	public static String path = "..\\..\\result\\";
 	public static Boolean isDstAsID = true;
 	public static HashSet<Integer> set1=new HashSet<Integer>(),set2=new HashSet<Integer>();
 	/** parameter for estimation on a single source **/
-	public static String dataStreamForFlowSize = "..\\..\\data\\datatrace.txt"; 
-	public static String dataSummaryForFlowSize = "..\\..\\data\\srcdstsize.txt"; 
-	public static String dataStreamForFlowSpread = "..\\..\\data\\datatrace.txt"; 
-	public static String dataSummaryForFlowSpread = "..\\..\\data\\dstspread.txt";
+	public static String dataStreamForFlowSize = "..\\..\\data\\datatrace.txt"; 	// Input for flow size measurement.
+	public static String dataSummaryForFlowSize = "..\\..\\data\\srcdstsize.txt"; 	// Output for flow size measurement.
+	public static String dataStreamForFlowSpread = "..\\..\\data\\datatrace.txt"; 	// Input for flow spread measurement.
+	public static String dataSummaryForFlowSpread = "..\\..\\data\\dstspread.txt";	// Output for flow spread measurement.
 	
 	/** Get flow id for size measurement in each row of a file. */
 	public static String getSizeFlowID(String[] strs, Boolean isEncoding) {
@@ -44,7 +44,7 @@ public class GeneralUtil {
 		return res;
 	}
 	
-	/** a hash function that maps the string value to int value */
+	/** A hash function that maps the string value to int value */
 	public static int FNVHash1(String data) {
 		final int p = 16777619;
 		int hash = (int) 2166136261L;
@@ -57,9 +57,13 @@ public class GeneralUtil {
 		hash += hash << 5;
 		return hash;
 	}
-	public static int FNVHash1(long key1,long key2) {
-			  return FNVHash1((key1<<32)|key2);
+	
+	/** FNVHash fucntion that takes two keys. */
+	public static int FNVHash1(long key1, long key2) {
+			  return FNVHash1((key1<<32) | key2);
 	}
+	
+	/** FNVHash function **/
 	public static int FNVHash1(long key) {
 		  key = (~key) + (key << 18);
 		  key = key ^ (key >>> 31);
@@ -69,7 +73,6 @@ public class GeneralUtil {
 		  key = key ^ (key >>> 22);
 		  return (int) key;
 	}
-	
 	
 	/** Thomas Wang hash */
 	public static int intHash(int key) {
